@@ -31,6 +31,7 @@ class WifiDataAdapter extends ArrayAdapter<ScanResult>{
 
         TextView textView = (TextView) rowView.findViewById(R.id.rowtext);
         textView.setText(values[position].SSID + " " + values[position].level);
+        textView.setBackgroundColor(Utils.getColorByPercents(values[position].level));
 
         return rowView;
     }

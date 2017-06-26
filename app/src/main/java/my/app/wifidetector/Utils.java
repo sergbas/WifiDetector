@@ -17,8 +17,25 @@ class Utils {
         return percents;
     }
 
-    public int getColorByPercents(int level){
+    public static int getColorByPercents(int level){
         int col = Color.WHITE;
+
+        int percents = getSignalPercents(level);
+
+        int r = 0;
+        int g = 0;
+
+        if(percents <= 50)
+        {
+            r = 255;
+            g = (int)(255*percents/50.0);
+        }
+        else{
+            r = (int)(255*(1-(percents-50)/50.0));
+            g = 255;
+        }
+
+        col = Color.argb(255, r, g, 0);
 
         return  col;
     }

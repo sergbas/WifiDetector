@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -73,8 +74,14 @@ public class MainActivity extends Activity {
 
         checkPermissions();
 
-        //visualizer = new TextViewVisualizer((TextView)findViewById(R.id.textView1));
-        visualizer = new ListViewVisualizer(this, (ListView)findViewById(R.id.listView));
+        TextView tv = (TextView)findViewById(R.id.textView1);
+        ListView lv = (ListView)findViewById(R.id.listView);
+        lv.setVisibility(tv.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+
+        if(tv.getVisibility() == View.VISIBLE)
+            visualizer = new TextViewVisualizer(tv);
+        else
+            visualizer = new ListViewVisualizer(this, lv);
 
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
@@ -82,11 +89,8 @@ public class MainActivity extends Activity {
         registerReceiver(receiverWifi, new IntentFilter(
                 WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 
-        Log.e(TAG, "mainWifi.isWifiEnabled():" + mainWifi.isWifiEnabled());
         if(!mainWifi.isWifiEnabled())
-        {
             mainWifi.setWifiEnabled(true);
-        }
 
         doInback();
     }
