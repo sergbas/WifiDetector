@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.BreakIterator;
@@ -34,6 +35,10 @@ public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private IWifiVisualizer visualizer;
+
+    WifiManager mainWifi;
+    WifiReceiver receiverWifi;
+    private final Handler handler = new Handler();
 
     public static final int MULTIPLE_PERMISSIONS = 10;
     String[] permissions = new String[] {
@@ -60,13 +65,6 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    WifiManager mainWifi;
-    WifiReceiver receiverWifi;
-
-    StringBuilder sb = new StringBuilder();
-
-    private final Handler handler = new Handler();
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -75,7 +73,8 @@ public class MainActivity extends Activity {
 
         checkPermissions();
 
-        visualizer = new TextViewVisualizer((TextView)findViewById(R.id.textView1));
+        //visualizer = new TextViewVisualizer((TextView)findViewById(R.id.textView1));
+        visualizer = new ListViewVisualizer(this, (ListView)findViewById(R.id.listView));
 
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
@@ -147,7 +146,7 @@ public class MainActivity extends Activity {
     }
 
     private ScanResult[] SortedWifiPoints() {
-        sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         List<ScanResult> wifiList;
         wifiList = mainWifi.getScanResults();
 
