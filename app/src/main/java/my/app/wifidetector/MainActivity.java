@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private TextView tv;
+    private IWifiVisualizer visualizer;
 
     public static final int MULTIPLE_PERMISSIONS = 10;
     String[] permissions = new String[] {
@@ -59,26 +59,13 @@ public class MainActivity extends Activity {
         }
         return true;
     }
-/*
-    @Override
-    protected void onPause() {
-        unregisterReceiver(receiverWifi);
-        super.onPause();
-    }
-/*
-    @Override
-    protected void onResume() {
-        registerReceiver(receiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-        super.onResume();
-    }
-*/
+
     WifiManager mainWifi;
     WifiReceiver receiverWifi;
 
     StringBuilder sb = new StringBuilder();
 
     private final Handler handler = new Handler();
-
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -88,7 +75,7 @@ public class MainActivity extends Activity {
 
         checkPermissions();
 
-        tv = (TextView)findViewById(R.id.textView1);
+        visualizer = new TextViewVisualizer((TextView)findViewById(R.id.textView1));
 
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
@@ -154,74 +141,30 @@ public class MainActivity extends Activity {
     {
         public void onReceive(Context c, Intent intent)
         {
-            //Log.e(TAG, "onReceive");
-
-            ArrayList<String> connections=new ArrayList<String>();
-            ArrayList<Float> Signal_Strenth= new ArrayList<Float>();
-
-            sb = new StringBuilder();
-            List<ScanResult> wifiList;
-            wifiList = mainWifi.getScanResults();
-            //Log.e(TAG, "wifiList.size(): " + wifiList.size());
-
-            StringBuilder sb = new StringBuilder();
-
-            ScanResult rssi[]=new ScanResult[wifiList.size()];
-            for(int i = 0; i <wifiList.size(); i++){
-                rssi[i]= wifiList.get(i);
-            }
-            Arrays.sort(rssi, new Comparator<ScanResult>() {
-                @Override
-                public int compare(ScanResult r1, ScanResult r2) {
-                    if(r1.level < r2.level) return 1;
-                    if(r1.level > r2.level) return -1;
-                    return 0;
-                }
-            });
-
-            for(ScanResult sr : rssi)
-            {
-                connections.add(sr.SSID);
-
-                int percents = getSignalPercents(sr.level);
-
-                sb.append("----------------\n");
-                sb.append("SSID:" + sr.SSID + "\n");
-                sb.append("frequency:" + sr.frequency + "\n");
-                sb.append("level:" + sr.level + " (" + percents + "%)\n");
-                sb.append(drawLevel(percents) + "\n");
-                sb.append("timestamp:" + sr.timestamp + "\n");
-                sb.append("capabilities:" + sr.capabilities + "\n");
-                //sb.append("centerFreq0:" + wifiList.get(i).centerFreq0 + "\n");
-                //sb.append("centerFreq1:" + wifiList.get(i).centerFreq1 + "\n");
-                //sb.append("----------------\n");
-            }
-
-            tv.setText(sb.toString());
+            ScanResult[] rssi = SortedWifiPoints();
+            visualizer.show(rssi);
         }
     }
 
-    private String drawLevel(int percents) {
-        String res = "";
-        for(int i = 0; i<(int)(percents * 0.333); i++)
-            res+="█";
+    private ScanResult[] SortedWifiPoints() {
+        sb = new StringBuilder();
+        List<ScanResult> wifiList;
+        wifiList = mainWifi.getScanResults();
 
-        return res;
+        ScanResult rssi[]=new ScanResult[wifiList.size()];
+        for(int i = 0; i <wifiList.size(); i++){
+            rssi[i]= wifiList.get(i);
+        }
+        Arrays.sort(rssi, new Comparator<ScanResult>() {
+            @Override
+            public int compare(ScanResult r1, ScanResult r2) {
+                if(r1.level < r2.level) return 1;
+                if(r1.level > r2.level) return -1;
+                return 0;
+            }
+        });
+
+        return rssi;
     }
 
-    public int getSignalPercents(int db)
-    {
-        int percents = 0;
-        if(db >= -35) db = -35;//100%
-        if(db <= -95 ) db = -95;//0%
-        percents = (int)(100 + 100 * (db + 35)/60.0);
-
-        return percents;
-    }
-
-    public int getColorByPercents(int level){
-        int col = Color.WHITE;
-
-        return  col;
-    }
 }
