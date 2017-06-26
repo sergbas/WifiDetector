@@ -29,9 +29,10 @@ class WifiDataAdapter extends ArrayAdapter<ScanResult>{
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.row, parent, false);
 
+        ScanResult sr = values[position];
         TextView textView = (TextView) rowView.findViewById(R.id.rowtext);
-        textView.setText(values[position].SSID + " " + values[position].level);
-        textView.setBackgroundColor(Utils.getColorByPercents(values[position].level));
+        textView.setText(sr.SSID + "   (" + Utils.getSignalPercents(sr.level) + "%)");
+        textView.setBackgroundColor(Utils.getColorByPercents(sr.level));
 
         return rowView;
     }
