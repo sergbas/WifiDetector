@@ -31,7 +31,15 @@ class WifiDataAdapter extends ArrayAdapter<ScanResult>{
 
         ScanResult sr = values[position];
         TextView textView = (TextView) rowView.findViewById(R.id.rowtext);
-        textView.setText(sr.SSID + "   (" + Utils.getSignalPercents(sr.level) + "%)");
+
+        StringBuilder sb = new StringBuilder();
+        int percents = Utils.getSignalPercents(sr.level);
+        sb.append("SSID:" + sr.SSID + "\n");
+        sb.append("frequency:" + sr.frequency + "\n");
+        sb.append("level:" + sr.level + " (" + percents + "%)\n");
+        sb.append(Utils.drawLevel(percents) + "\n");
+
+        textView.setText(sb.toString());
         textView.setBackgroundColor(Utils.getColorByPercents(sr.level));
 
         return rowView;
